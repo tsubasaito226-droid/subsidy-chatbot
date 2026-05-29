@@ -1,0 +1,304 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>下関市 補助金・給付金 案内チャット</title>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: 'Hiragino Sans', 'Meiryo', sans-serif;
+      background: #f0f4f8;
+      display: flex;
+      flex-direction: column;
+      min-height: 100vh;
+    }
+
+    header {
+      background: #1a56a0;
+      color: #fff;
+      padding: 14px 20px;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      box-shadow: 0 2px 6px rgba(0,0,0,.2);
+    }
+    header img { width: 36px; height: 36px; }
+    header h1 { font-size: 1rem; line-height: 1.3; }
+
+    #chat {
+      flex: 1;
+      padding: 16px;
+      overflow-y: auto;
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+      max-width: 680px;
+      width: 100%;
+      margin: 0 auto;
+    }
+
+    /* ── メッセージバブル ── */
+    .bubble-wrap {
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+    }
+    .bubble-wrap.bot { align-items: flex-start; }
+    .bubble-wrap.user { align-items: flex-end; }
+
+    .bubble {
+      max-width: 80%;
+      padding: 10px 14px;
+      border-radius: 16px;
+      line-height: 1.6;
+      font-size: 0.92rem;
+      white-space: pre-wrap;
+    }
+    .bubble.bot {
+      background: #fff;
+      border-top-left-radius: 4px;
+      box-shadow: 0 1px 3px rgba(0,0,0,.1);
+      color: #222;
+    }
+    .bubble.user {
+      background: #1a56a0;
+      border-top-right-radius: 4px;
+      color: #fff;
+    }
+
+    /* ── 選択肢ボタン ── */
+    .choices {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      max-width: 480px;
+      width: 100%;
+    }
+    .choice-btn {
+      background: #fff;
+      border: 2px solid #1a56a0;
+      color: #1a56a0;
+      border-radius: 24px;
+      padding: 10px 18px;
+      font-size: 0.9rem;
+      cursor: pointer;
+      text-align: left;
+      transition: background .15s, color .15s;
+      line-height: 1.5;
+    }
+    .choice-btn:hover { background: #1a56a0; color: #fff; }
+    .choice-btn:disabled { opacity: 0.45; cursor: default; }
+
+    /* ── 結果カード ── */
+    .result-card {
+      background: #fff;
+      border-left: 5px solid #1a56a0;
+      border-radius: 8px;
+      padding: 16px 18px;
+      max-width: 540px;
+      box-shadow: 0 2px 6px rgba(0,0,0,.1);
+      font-size: 0.88rem;
+      line-height: 1.7;
+    }
+    .result-card.no-match { border-color: #e07b00; }
+    .result-card h3 {
+      font-size: 1rem;
+      color: #1a56a0;
+      margin-bottom: 8px;
+    }
+    .result-card.no-match h3 { color: #e07b00; }
+    .result-card dl { display: grid; grid-template-columns: auto 1fr; gap: 4px 10px; margin-top: 10px; }
+    .result-card dt { font-weight: bold; color: #555; white-space: nowrap; }
+    .result-card dd { color: #333; }
+    .result-card .url-link {
+      display: inline-block;
+      margin-top: 10px;
+      color: #1a56a0;
+      font-size: 0.85rem;
+    }
+
+    /* ── リセットボタン ── */
+    .reset-btn {
+      margin-top: 6px;
+      background: #f0f4f8;
+      border: 2px solid #aaa;
+      color: #555;
+      border-radius: 24px;
+      padding: 8px 20px;
+      font-size: 0.88rem;
+      cursor: pointer;
+      transition: background .15s;
+    }
+    .reset-btn:hover { background: #dde3ea; }
+
+    footer {
+      text-align: center;
+      font-size: 0.75rem;
+      color: #888;
+      padding: 10px;
+    }
+  </style>
+</head>
+<body>
+
+<header>
+  <svg xmlns="http://www.w3.org/2000/svg" width="36" height="36" viewBox="0 0 36 36" fill="none">
+    <rect width="36" height="36" rx="8" fill="white" fill-opacity=".15"/>
+    <path d="M18 6C11.37 6 6 10.92 6 17c0 3.6 1.8 6.8 4.6 8.9L9 30l4.5-2.3c1.4.4 2.9.6 4.5.6 6.63 0 12-4.92 12-11S24.63 6 18 6Z" fill="white"/>
+  </svg>
+  <h1>下関市<br>補助金・給付金 案内チャット</h1>
+</header>
+
+<div id="chat"></div>
+
+<footer>このチャットは下関市の補助金情報をご案内するものです。内容は参考情報であり、詳細は各担当窓口にお問い合わせください。</footer>
+
+<script>
+// ── データ読み込み ──────────────────────────────────────────
+let FLOW = null;
+let SUBSIDIES = null;
+
+async function loadData() {
+  const [flowRes, subRes] = await Promise.all([
+    fetch('./data/flow.json'),
+    fetch('./data/subsidies.json')
+  ]);
+  FLOW = await flowRes.json();
+  const subData = await subRes.json();
+  SUBSIDIES = subData.subsidies;
+}
+
+// ── DOM helpers ───────────────────────────────────────────
+const chat = document.getElementById('chat');
+
+function scrollBottom() {
+  window.scrollTo({ top: document.body.scrollHeight, behavior: 'smooth' });
+}
+
+function addBubble(text, who) {
+  const wrap = document.createElement('div');
+  wrap.className = `bubble-wrap ${who}`;
+  const b = document.createElement('div');
+  b.className = `bubble ${who}`;
+  b.textContent = text;
+  wrap.appendChild(b);
+  chat.appendChild(wrap);
+  scrollBottom();
+  return wrap;
+}
+
+function addChoices(choices, onSelect) {
+  const wrap = document.createElement('div');
+  wrap.className = 'bubble-wrap bot';
+  const div = document.createElement('div');
+  div.className = 'choices';
+  choices.forEach(c => {
+    const btn = document.createElement('button');
+    btn.className = 'choice-btn';
+    btn.textContent = c.label;
+    btn.addEventListener('click', () => {
+      // 全ボタン無効化
+      div.querySelectorAll('.choice-btn').forEach(b => b.disabled = true);
+      onSelect(c);
+    });
+    div.appendChild(btn);
+  });
+  wrap.appendChild(div);
+  chat.appendChild(wrap);
+  scrollBottom();
+  return wrap;
+}
+
+function addResultCard(node) {
+  const wrap = document.createElement('div');
+  wrap.className = 'bubble-wrap bot';
+
+  if (node.result && node.subsidies) {
+    node.subsidies.forEach(sid => {
+      const s = SUBSIDIES[sid];
+      if (!s) return;
+      const card = document.createElement('div');
+      card.className = 'result-card';
+      card.innerHTML = `
+        <h3>✅ ${s.name}</h3>
+        <p>${s.summary}</p>
+        <dl>
+          <dt>補助額</dt><dd>${s.amount}</dd>
+          <dt>主な条件</dt><dd>${s.conditions}</dd>
+          <dt>申請期限</dt><dd>${s.deadline}</dd>
+          <dt>問い合わせ</dt><dd>${s.contact}</dd>
+        </dl>
+        <a class="url-link" href="${s.url}" target="_blank" rel="noopener">▶ 下関市公式サイトで詳細を確認</a>
+      `;
+      wrap.appendChild(card);
+    });
+  } else {
+    const card = document.createElement('div');
+    card.className = 'result-card no-match';
+    card.innerHTML = `<h3>⚠️ 該当なし</h3><p style="white-space:pre-wrap">${node.message}</p>`;
+    wrap.appendChild(card);
+  }
+
+  // メッセージ（結果カードの上に表示）
+  if (node.message && node.result) {
+    const msgBubble = document.createElement('div');
+    msgBubble.className = 'bubble bot';
+    msgBubble.textContent = node.message;
+    wrap.insertBefore(msgBubble, wrap.firstChild);
+  }
+
+  // リセットボタン
+  const resetBtn = document.createElement('button');
+  resetBtn.className = 'reset-btn';
+  resetBtn.textContent = '🔄 最初からやり直す';
+  resetBtn.addEventListener('click', () => {
+    chat.innerHTML = '';
+    startFlow();
+  });
+  wrap.appendChild(resetBtn);
+
+  chat.appendChild(wrap);
+  scrollBottom();
+}
+
+// ── フロー制御 ────────────────────────────────────────────
+function goToNode(nodeId) {
+  const node = FLOW[nodeId];
+  if (!node) {
+    addBubble('エラー：ノードが見つかりません。', 'bot');
+    return;
+  }
+
+  // 結果ノード
+  if ('result' in node) {
+    addResultCard(node);
+    return;
+  }
+
+  // 質問ノード
+  setTimeout(() => {
+    addBubble(node.message, 'bot');
+    addChoices(node.choices, (choice) => {
+      addBubble(choice.label, 'user');
+      setTimeout(() => goToNode(choice.next), 400);
+    });
+  }, 300);
+}
+
+function startFlow() {
+  goToNode('start');
+}
+
+// ── 初期化 ────────────────────────────────────────────────
+loadData().then(() => {
+  addBubble('こんにちは！下関市の補助金・給付金をご案内します。\nいくつかの質問に答えていただくだけで、ご利用いただける可能性のある補助金をお調べします。', 'bot');
+  setTimeout(startFlow, 600);
+}).catch(err => {
+  console.error(err);
+  addBubble('データの読み込みに失敗しました。ページを再読み込みしてください。', 'bot');
+});
+</script>
+</body>
+</html>

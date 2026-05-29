@@ -1,0 +1,190 @@
+{
+  "start": {
+    "message": "下関市の補助金・給付金をご案内します。\nあなたのご状況に近いものを選んでください。",
+    "choices": [
+      { "label": "移住・転入を考えている", "next": "migration" },
+      { "label": "住宅を取得・改修したい", "next": "housing" },
+      { "label": "空き家・空き店舗を活用したい", "next": "vacant" },
+      { "label": "結婚・子育て・妊娠について", "next": "family" },
+      { "label": "就職・就農・起業について", "next": "work" }
+    ]
+  },
+
+  "migration": {
+    "message": "移住・定住に関するご状況を教えてください。",
+    "choices": [
+      { "label": "東京23区から移住予定", "next": "migration_tokyo" },
+      { "label": "東京圏・大阪・名古屋・広島・福岡から移住予定", "next": "migration_metro" },
+      { "label": "過疎地域（豊田・豊浦・豊北・蓋井島・六連島）に定住したい", "next": "migration_rural" },
+      { "label": "UJIターンして民間賃貸住宅に住む予定", "next": "migration_kurashi" },
+      { "label": "その他の地域から移住予定", "next": "no_match" }
+    ]
+  },
+  "migration_kurashi": {
+    "message": "以下の条件を確認してください。",
+    "choices": [
+      { "label": "世帯主が39歳以下、または中学生以下の子どもがいる世帯", "next": "result_s015" },
+      { "label": "どちらにも当てはまらない", "next": "no_match" }
+    ]
+  },
+  "migration_tokyo": {
+    "message": "就業先はありますか？",
+    "choices": [
+      { "label": "「やまぐちジョブナビ」掲載の求人に就業予定", "next": "result_s001" },
+      { "label": "やまぐち創業補助金を受けて創業予定", "next": "result_s001_sogyou" },
+      { "label": "就業先はまだ決まっていない", "next": "no_match_migration" }
+    ]
+  },
+  "migration_metro": {
+    "message": "就業先はありますか？",
+    "choices": [
+      { "label": "「やまぐちジョブナビ」掲載の求人に就業予定", "next": "result_s002" },
+      { "label": "やまぐち創業補助金を受けて創業予定", "next": "result_s002_sogyou" },
+      { "label": "就業先はまだ決まっていない", "next": "no_match_migration" }
+    ]
+  },
+  "migration_rural": {
+    "message": "現在のお住まいを教えてください。",
+    "choices": [
+      { "label": "下関市外から転入する（Uターン含む）", "next": "result_s003" },
+      { "label": "下関市内の他の地域から転居する", "next": "no_match_rural" }
+    ]
+  },
+
+  "housing": {
+    "message": "住宅に関するご状況を教えてください。",
+    "choices": [
+      { "label": "29歳以下で住宅ローンを組んで購入予定", "next": "result_s005" },
+      { "label": "空き家バンクの物件を購入して改修したい", "next": "result_s006" },
+      { "label": "下関駅周辺の空き家を取り壊したい", "next": "result_s007" },
+      { "label": "所有している空き家の管理を業者に依頼したい", "next": "result_s008" }
+    ]
+  },
+
+  "vacant": {
+    "message": "空き物件の活用方法を教えてください。",
+    "choices": [
+      { "label": "空き店舗・空き家で店舗開業（小売・飲食・サービス業）", "next": "result_s009" },
+      { "label": "空き家バンクの物件を住居として改修したい", "next": "result_s006" },
+      { "label": "空き家を取り壊したい（下関駅周辺）", "next": "result_s007" }
+    ]
+  },
+
+  "family": {
+    "message": "結婚・子育て・妊娠のどれに当てはまりますか？",
+    "choices": [
+      { "label": "最近結婚した（新婚）", "next": "result_s010" },
+      { "label": "妊娠中または出産を予定している", "next": "result_s011" },
+      { "label": "子どもの医療費が心配", "next": "result_s012" },
+      { "label": "過疎地域に住んでいて第3子以降を出産した", "next": "result_s004" }
+    ]
+  },
+
+  "work": {
+    "message": "就職・就農・起業についてどのようなご状況ですか？",
+    "choices": [
+      { "label": "奨学金を返還中で下関市内に就職・起業したい", "next": "result_s013" },
+      { "label": "農業に興味があり就農体験したい（50歳未満）", "next": "result_s014" },
+      { "label": "空き物件でお店を開業したい", "next": "result_s009" }
+    ]
+  },
+
+  "result_s001": {
+    "result": true,
+    "subsidies": ["s001"],
+    "message": "移住支援金（東京23区からの移住）に該当する可能性があります。"
+  },
+  "result_s001_sogyou": {
+    "result": true,
+    "subsidies": ["s001"],
+    "message": "移住支援金とやまぐち創業補助金の組み合わせで最大300万円を受給できる場合があります。まずは移住先の市町にお問い合わせください。"
+  },
+  "result_s002": {
+    "result": true,
+    "subsidies": ["s002"],
+    "message": "移住支援金（大都市圏からの移住）に該当する可能性があります。"
+  },
+  "result_s002_sogyou": {
+    "result": true,
+    "subsidies": ["s002"],
+    "message": "移住支援金とやまぐち創業補助金の組み合わせで支援を受けられる場合があります。まずは移住先の市町にお問い合わせください。"
+  },
+  "result_s003": {
+    "result": true,
+    "subsidies": ["s003"],
+    "message": "定住奨励金に該当する可能性があります。過疎地域への転入後6ヶ月以上居住することが条件です。"
+  },
+  "result_s004": {
+    "result": true,
+    "subsidies": ["s004"],
+    "message": "出産祝い金（過疎地域）に該当する可能性があります。"
+  },
+  "result_s005": {
+    "result": true,
+    "subsidies": ["s005"],
+    "message": "やまぐち若者定住応援事業補助金に該当する可能性があります。29歳を超えるまで毎年申請できます。"
+  },
+  "result_s006": {
+    "result": true,
+    "subsidies": ["s006"],
+    "message": "空き家バンク活用促進改修補助金に該当する可能性があります。先着20件程度ですのでお早めに。"
+  },
+  "result_s007": {
+    "result": true,
+    "subsidies": ["s007"],
+    "message": "下関駅周辺地区空き家除却補助金に該当する可能性があります。補助金交付決定後に工事着手が条件です。"
+  },
+  "result_s008": {
+    "result": true,
+    "subsidies": ["s008"],
+    "message": "空き家管理・流通促進支援事業補助金に該当する可能性があります。"
+  },
+  "result_s009": {
+    "result": true,
+    "subsidies": ["s009"],
+    "message": "空き物件活用ビジネス支援事業費補助金に該当する可能性があります。審査会への参加が必要です。"
+  },
+  "result_s010": {
+    "result": true,
+    "subsidies": ["s010"],
+    "message": "下関市結婚新生活支援補助金に該当する可能性があります。抽選制のため事前エントリー（令和7年8月1日〜10月31日）が必要です。LiveHUBしものせき（0120-540-201）にご相談ください。"
+  },
+  "result_s011": {
+    "result": true,
+    "subsidies": ["s011"],
+    "message": "出産・子育て応援ギフトに該当します。妊娠届出時に保健センターでご申請ください。"
+  },
+  "result_s012": {
+    "result": true,
+    "subsidies": ["s012"],
+    "message": "令和7年12月から18歳まで医療費が無料になりました。受給者証が交付されます。"
+  },
+  "result_s013": {
+    "result": true,
+    "subsidies": ["s013"],
+    "message": "奨学金返還支援補助金に該当する可能性があります。大学在学中のエントリーが必要な場合があります。"
+  },
+  "result_s014": {
+    "result": true,
+    "subsidies": ["s014"],
+    "message": "ヤングファーマーズサポート事業に該当する可能性があります。令和8年5月29日締切です。"
+  },
+  "result_s015": {
+    "result": true,
+    "subsidies": ["s015"],
+    "message": "下関暮らしサポート補助金に該当する可能性があります。転入後6ヶ月以内にLiveHUBしものせきへご申請ください。"
+  },
+
+  "no_match": {
+    "result": false,
+    "message": "ご状況に合う補助金が見つかりませんでした。詳しくは下関市役所にお問い合わせください。\n下関市役所：TEL 083-231-1111"
+  },
+  "no_match_migration": {
+    "result": false,
+    "message": "移住支援金は「やまぐちジョブナビ」掲載の求人への就業または創業補助金を受けた創業が条件です。まずはやまぐちジョブナビをご確認ください。\n問い合わせ：下関市 共創イノベーション課 TEL: 083-231-5838"
+  },
+  "no_match_rural": {
+    "result": false,
+    "message": "定住奨励金は市外からの転入者（Uターン者含む）が対象です。市内転居の場合は対象外となります。\n詳しくはお問い合わせください。TEL: 083-231-5838"
+  }
+}
